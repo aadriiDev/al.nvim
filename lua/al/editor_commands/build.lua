@@ -42,8 +42,17 @@ local build_package = function()
         if result.success then
             Util.info("Success: The package is created")
         else
-            Util.error("Failed creating AL package\r\n" .. vim.inspect(err))
+            Util.error("Failed creating AL package")
         end
+        vim.schedule(function()
+            local ok, trouble = pcall(require, "trouble")
+            if ok then
+                trouble.open({ mode = "diagnostics" })
+            else
+                vim.diagnostic.setqflist()
+                vim.cmd("copen")
+            end
+        end)
         coroutine.resume(co)
     end)
     return coroutine.yield()
