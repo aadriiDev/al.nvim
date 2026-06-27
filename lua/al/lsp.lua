@@ -115,7 +115,26 @@ function M.set_handler(client, type, handler)
 end
 
 local function kill_orphaned_editor_services()
-    vim.system({ "pkill", "-f", "Microsoft.Dynamics.Nav.EditorServices.Host" }, { detach = true })
+    -- Kill only truly orphaned processes (parent PID = 1, i.e. no NeoVim owns them)
+    local handle = io.popen("ps -eo pid,ppid,comm | grep EditorServices.Host | grep -v grep")
+    if not handle then return end
+    for line in handle:lines() do
+        local pid, ppid = line:match("^%s*(%d+)%s+(%d+)")
+        if pid and ppid and ppid == "1" then
+            vim.system({ "kill", pid }, { detach = true })
+        end
+    end
+    handle:close()
+end
+
+local function kill_our_editor_services()
+    local clients = vim.lsp.get_clients({ name = "al_ls" })
+    for _, client in ipairs(clients) do
+        local handle = client.rpc and client.rpc.handle
+        if handle and not handle:is_closing() then
+            handle:kill(15) -- SIGTERM
+        end
+    end
 end
 
 function M.setup()
@@ -123,7 +142,7 @@ function M.setup()
 
     vim.api.nvim_create_autocmd("VimLeavePre", {
         group = vim.api.nvim_create_augroup("al_lsp_cleanup", { clear = true }),
-        callback = kill_orphaned_editor_services,
+        callback = kill_our_editor_services,
     })
 
     local cmd = M.cmd()
