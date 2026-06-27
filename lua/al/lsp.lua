@@ -114,26 +114,34 @@ function M.set_handler(client, type, handler)
     end
 end
 
-local function kill_orphaned_editor_services()
-    -- Kill only truly orphaned processes (parent PID = 1, i.e. no NeoVim owns them)
-    local handle = io.popen("ps -eo pid,ppid,comm | grep EditorServices.Host | grep -v grep")
-    if not handle then return end
+local function get_editor_services_pids_by_ppid(ppid)
+    local pids = {}
+    local handle = io.popen("ps -eo pid,ppid,command")
+    if not handle then return pids end
     for line in handle:lines() do
-        local pid, ppid = line:match("^%s*(%d+)%s+(%d+)")
-        if pid and ppid and ppid == "1" then
-            vim.system({ "kill", pid }, { detach = true })
+        local pid, parent = line:match("^%s*(%d+)%s+(%d+)%s+")
+        if pid and parent == tostring(ppid) and line:find("EditorServices.Host", 1, true) then
+            table.insert(pids, pid)
         end
     end
     handle:close()
+    return pids
+end
+
+local function kill_orphaned_editor_services()
+    -- Kill only processes whose parent is PID 1 (ningún NeoVim los posee)
+    local pids = get_editor_services_pids_by_ppid(1)
+    for _, pid in ipairs(pids) do
+        os.execute("kill " .. pid)
+    end
 end
 
 local function kill_our_editor_services()
-    local clients = vim.lsp.get_clients({ name = "al_ls" })
-    for _, client in ipairs(clients) do
-        local handle = client.rpc and client.rpc.handle
-        if handle and not handle:is_closing() then
-            handle:kill(15) -- SIGTERM
-        end
+    -- Kill only EditorServices.Host children of THIS NeoVim process
+    local nvim_pid = vim.fn.getpid()
+    local pids = get_editor_services_pids_by_ppid(nvim_pid)
+    for _, pid in ipairs(pids) do
+        os.execute("kill " .. pid)
     end
 end
 
