@@ -114,7 +114,18 @@ function M.set_handler(client, type, handler)
     end
 end
 
+local function kill_orphaned_editor_services()
+    vim.system({ "pkill", "-f", "Microsoft.Dynamics.Nav.EditorServices.Host" }, { detach = true })
+end
+
 function M.setup()
+    kill_orphaned_editor_services()
+
+    vim.api.nvim_create_autocmd("VimLeavePre", {
+        group = vim.api.nvim_create_augroup("al_lsp_cleanup", { clear = true }),
+        callback = kill_orphaned_editor_services,
+    })
+
     local cmd = M.cmd()
     if not cmd then
         return
