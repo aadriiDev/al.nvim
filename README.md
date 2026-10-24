@@ -17,7 +17,9 @@ multi-project workspaces for Microsoft Dynamics 365 Business Central.
 - **Treesitter** — syntax highlighting via [tree-sitter-al]
 - **Snippets** — AL snippets via LuaSnip, plus the snippets bundled with the
   installed AL extension and the design pattern, test, upgrade and FlowField
-  snippets of the CRS AL Language extension (`ttestcasewaldo`...)
+  snippets of the CRS AL Language extension (`ttestcasewaldo`...), and
+  `tappjson` / `tdependency` in app.json (new id, runtime from the application
+  version)
 - **Code cleanup** — add the missing ToolTips (AA0218) to page fields and
   actions and Captions to table fields, in a file or the whole project
 - **File naming** — rename and reorganize files after the object they contain,
