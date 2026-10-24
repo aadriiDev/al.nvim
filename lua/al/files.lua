@@ -160,23 +160,58 @@ local function decode_jsonc(text)
     return nil
 end
 
+--- Nearest *.code-workspace file at or above `root` (e.g. the project's parent
+--- folder, for a multi-root workspace with one folder per AL project).
+---@param root string
+---@return string|nil
+local function find_workspace_file(root)
+    local found = vim.fs.find(function(name)
+        return name:match("%.code%-workspace$") ~= nil
+    end, { path = root, upward = true, type = "file", limit = 1 })
+    return found[1]
+end
+
+--- "settings" object of the nearest *.code-workspace, if any. A workspace's
+--- "settings" apply to every folder it contains, so no folder matching is
+--- needed: the project being under some folder of that workspace is enough.
+---@param root string
+---@return table
+local function workspace_settings(root)
+    local path = find_workspace_file(root)
+    if not path then
+        return {}
+    end
+    local fd = io.open(path)
+    if not fd then
+        return {}
+    end
+    local json = decode_jsonc(fd:read("*a")) or {}
+    fd:close()
+    return type(json.settings) == "table" and json.settings or {}
+end
+
 --- Effective settings for the project at `root`: plugin config, overridden by
---- the CRS.* keys in the project's .vscode/settings.json.
+--- the CRS.* keys in the nearest *.code-workspace "settings" (if any), in turn
+--- overridden by the CRS.* keys in the project's .vscode/settings.json.
 ---@param root string|nil
 ---@return al.Config.Files
 function M.settings(root)
     local settings = vim.deepcopy(Config.files)
     if root and settings.read_crs_settings then
-        local path = vim.fs.joinpath(root, ".vscode", "settings.json")
-        local fd = io.open(path)
+        local workspace_json = workspace_settings(root)
+        local vscode_json = {}
+        local fd = io.open(vim.fs.joinpath(root, ".vscode", "settings.json"))
         if fd then
-            local json = decode_jsonc(fd:read("*a")) or {}
+            vscode_json = decode_jsonc(fd:read("*a")) or {}
             fd:close()
-            for crs_key, key in pairs(crs_keys) do
-                local value = json[crs_key]
-                if value ~= nil and value ~= vim.NIL then
-                    settings[key] = value
-                end
+        end
+        for crs_key, key in pairs(crs_keys) do
+            local value = vscode_json[crs_key]
+            if value == nil or value == vim.NIL then
+                value = workspace_json[crs_key]
+            end
+            if value ~= nil and value ~= vim.NIL then
+                settings[key] = value
             end
         end
     end
