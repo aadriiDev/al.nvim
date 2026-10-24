@@ -113,6 +113,7 @@ local field_order = {
     "name",
     "request",
     "type",
+    "environmentType",
     "server",
     "port",
     "serverInstance",
@@ -148,6 +149,7 @@ local function build_config()
     }
 
     if kind:match("^On%-premises") then
+        config.environmentType = "OnPrem"
         config.server = ask_input("URL del servidor: ", "http://bcserver")
         if not config.server then
             return nil
@@ -156,14 +158,16 @@ local function build_config()
         config.port = port and tonumber(port) or 7049
         config.serverInstance = ask_input("Nombre de instancia (serverInstance): ", "BC")
         config.tenant = ask_input("Tenant: ", "default")
-        config.authentication = ask_select("Autenticacion:", { "UserPassword", "Windows", "AAD", "MicrosoftEntraID" })
-            or "UserPassword"
-    else
-        config.server = "https://businesscentral.dynamics.com"
-        config.environmentName = ask_input("Nombre del entorno (environmentName): ", "Sandbox")
-        config.tenant = ask_input("Tenant (dominio o id): ", "default")
-        config.authentication = "MicrosoftEntraID"
+        config.authentication = ask_select("Autenticacion:", { "UserPassword", "Windows", "AAD" }) or "UserPassword"
         config.usePublicURLFromServer = true
+    else
+        -- "Sandbox" o "Production": https://learn.microsoft.com/dynamics365/business-central/dev-itpro/developer/devenv-json-launch-file
+        config.environmentType = ask_select("Entorno de Business Central:", { "Sandbox", "Production" }) or "Sandbox"
+        config.environmentName = ask_input(
+            "Nombre del entorno (environmentName): ",
+            config.environmentType == "Production" and "production" or "Sandbox"
+        )
+        config.tenant = ask_input("Tenant (dominio Microsoft Entra), vacio para omitir: ")
     end
 
     local startup_id = ask_input("Objeto de inicio (startupObjectId), vacio para omitir: ", "22")
