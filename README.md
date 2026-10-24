@@ -18,6 +18,9 @@ multi-project workspaces for Microsoft Dynamics 365 Business Central.
 - **Snippets** — AL snippets via LuaSnip, plus the snippets bundled with the installed AL extension
 - **File naming** — rename and reorganize files after the object they contain,
   with the same patterns and `CRS.*` settings as the CRS AL Language extension
+- **Variables** — variable names from the type (nvim-cmp source and `v*`
+  snippets), jump to the local/global var section and sort declarations as
+  CodeCop AA0021 expects
 - **Progress notifications** — real-time feedback during project loading and
   builds
 
@@ -178,7 +181,35 @@ require("al").setup({
 | `:AL renameAllFiles` | Rename every AL file of the project (asks first) |
 | `:AL reorganizeFile` | Move the current file to `<subfolder>/<object type>/` and rename it |
 | `:AL reorganizeAllFiles` | Reorganize every AL file of the project (asks first) |
+| `:AL gotoLocalVars` | Jump to the var section of the current procedure (adds one if missing) |
+| `:AL gotoGlobalVars` | Jump to the object's global var section |
+| `:AL sortVariables` | Sort every var section in the AA0021 order |
 | `:AL lsp` | Show AL LSP client info and settings |
+
+## Variables
+
+Variable names are built from the object name, like the AL Variable Helper
+extension: the full name, an abbreviated one using the Microsoft abbreviations
+and the capitals (`Record "Sales Header"` → `SalesHeader`, `SalesHdr`, `SH`).
+Temporary records get the `Temp` prefix that AA0073 requires.
+
+- **Snippets** (LuaSnip): `vrecord`, `vcodeunit`, `vreport`, `vxmlport`,
+  `vquery`, `vpage`, `vtestpage`, `venum` and `vinterface`. Type the object
+  first; the name follows it. In `vrecord` the second field chooses
+  `temporary`.
+- **nvim-cmp source** `al_var`: with the cursor on the name of a declaration
+  (`|: Record Customer;`), it offers the names above. Add it to your sources:
+
+  ```lua
+  sources = cmp.config.sources({ { name = "nvim_lsp" }, { name = "al_var" }, ... })
+  ```
+
+- `variables.ignore_prefixes` / `ignore_suffixes` are removed from object names
+  first, together with `files.object_name_prefix` / `object_name_suffix`.
+- `:AL sortVariables` puts Record, Report, Codeunit, XmlPort, Page, Query,
+  Notification, BigText, DateFormula, RecordId, RecordRef, FieldRef and
+  FilterPageBuilder first, in that order; other declarations keep their order.
+  Sections with `#if` directives are left untouched.
 
 ## File naming
 

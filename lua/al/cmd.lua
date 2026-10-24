@@ -169,6 +169,15 @@ M.commands = {
     reorganizeAllFiles = function()
         require("al.files").all("reorganize")
     end,
+    gotoLocalVars = function()
+        require("al.variables").goto_local()
+    end,
+    gotoGlobalVars = function()
+        require("al.variables").goto_global()
+    end,
+    sortVariables = function()
+        require("al.variables").sort_command()
+    end,
 }
 
 function M.execute(input)

@@ -24,6 +24,7 @@ local M = {}
 ---@field lsp al.Config.LSP
 ---@field multiproject al.Config.Multiproject
 ---@field files al.Config.Files
+---@field variables al.Config.Variables
 ---@field extensionsPath string
 ---@field vscodeExtensionsPath string
 ---@field dotnetPath string
@@ -40,6 +41,8 @@ local defaults = {
     integrations = {
         luasnip = true,
         treesitter = true,
+        -- Registers the "al_var" nvim-cmp source (variable names from the type)
+        cmp = true,
     },
     workspace = {
         alResourceConfigurationSettings = {
@@ -101,6 +104,12 @@ local defaults = {
         remove_underscore_from_filename = true,
         -- CRS.* keys in the project's .vscode/settings.json override these
         read_crs_settings = true,
+    },
+    -- Variable names suggested from the type (al_var cmp source, v* snippets).
+    -- files.object_name_prefix/suffix are always ignored too.
+    variables = {
+        ignore_prefixes = {},
+        ignore_suffixes = {},
     },
 }
 

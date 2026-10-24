@@ -7,6 +7,7 @@ M.p2i = {
     ["LuaSnip"] = "luasnip",
     ["nvim-treesitter"] = "treesitter",
     ["dap"] = "dap",
+    ["nvim-cmp"] = "cmp",
 }
 
 -- integration to plugin
