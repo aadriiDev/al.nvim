@@ -16,6 +16,8 @@ multi-project workspaces for Microsoft Dynamics 365 Business Central.
 - **Build system** — `:AL build`, `:AL downloadSymbols`, `:AL definition`
 - **Treesitter** — syntax highlighting via [tree-sitter-al]
 - **Snippets** — AL snippets via LuaSnip, plus the snippets bundled with the installed AL extension
+- **File naming** — rename and reorganize files after the object they contain,
+  with the same patterns and `CRS.*` settings as the CRS AL Language extension
 - **Progress notifications** — real-time feedback during project loading and
   builds
 
@@ -139,6 +141,14 @@ require("al").setup({
         -- Maximum time (ms) to wait for a project closure to load
         closure_timeout_ms = 300000,
     },
+
+    -- :AL renameFile / reorganizeFile (see "File naming" below)
+    files = {
+        pattern = "<ObjectNameShort>.<ObjectTypeShortPascalCase>.al",
+        subfolder = "src",
+        on_save = "none", -- "none" | "rename" | "reorganize"
+        use_git_mv = false,
+    },
 })
 ```
 
@@ -164,7 +174,36 @@ require("al").setup({
 | `:AL symbolSearch [query]` | Search AL symbols |
 | `:AL dependencies` | Show package dependencies |
 | `:AL generatePermissionSet` | Generate a permission set AL object |
+| `:AL renameFile` | Rename the current file after its object |
+| `:AL renameAllFiles` | Rename every AL file of the project (asks first) |
+| `:AL reorganizeFile` | Move the current file to `<subfolder>/<object type>/` and rename it |
+| `:AL reorganizeAllFiles` | Reorganize every AL file of the project (asks first) |
 | `:AL lsp` | Show AL LSP client info and settings |
+
+## File naming
+
+`:AL renameFile` and `:AL reorganizeFile` work like the CRS AL Language
+extension. The default pattern, `<ObjectNameShort>.<ObjectTypeShortPascalCase>.al`,
+is the one the AA0215 rule expects (`CustomerList.Page.al`). Patterns can use
+`<ObjectType>`, `<ObjectTypeShort>`, `<ObjectTypeShortPascalCase>`,
+`<ObjectTypeShortUpper>`, `<ObjectId>`, `<ObjectName>`, `<ObjectNameShort>`,
+`<BaseName>`, `<BaseNameShort>`, `<BaseId>`, `<Prefix>` and `<Suffix>`.
+
+- Extension objects use `pattern_extensions`; page customizations use
+  `pattern_page_customizations`. `<BaseId>` comes from a comment after the base
+  object: `pageextension 50100 "My Ext" extends "Customer Card" // 21`.
+- Reorganize moves files to `<root>/<subfolder>/<object type>/`, or to folders
+  built from the namespace with `by_namespace = true`. Test codeunits go to
+  `<root>/test/`.
+- `object_name_prefix` / `object_name_suffix` are added to the object name in
+  the file when missing; `remove_prefix_from_filename` /
+  `remove_suffix_from_filename` leave them out of the file name.
+- `on_save = "rename"` or `"reorganize"` applies it every time an AL file is
+  saved.
+- The `CRS.*` keys in the project's `.vscode/settings.json` (`CRS.FileNamePattern`,
+  `CRS.AlSubFolderName`, `CRS.OnSaveAlFileAction`, `CRS.RenameWithGit`,
+  `CRS.ObjectNamePrefix`...) override these options, so projects already set up
+  for CRS keep their naming. Set `read_crs_settings = false` to ignore them.
 
 ## Statusline
 

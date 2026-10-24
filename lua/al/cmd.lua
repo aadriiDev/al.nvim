@@ -157,6 +157,18 @@ M.commands = {
     generatePermissionSet = function()
         require("al.editor_commands.generate_permission_set")()
     end,
+    renameFile = function()
+        require("al.files").current("rename")
+    end,
+    renameAllFiles = function()
+        require("al.files").all("rename")
+    end,
+    reorganizeFile = function()
+        require("al.files").current("reorganize")
+    end,
+    reorganizeAllFiles = function()
+        require("al.files").all("reorganize")
+    end,
 }
 
 function M.execute(input)

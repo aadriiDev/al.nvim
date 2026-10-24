@@ -23,6 +23,7 @@ local M = {}
 ---@class al.Config
 ---@field lsp al.Config.LSP
 ---@field multiproject al.Config.Multiproject
+---@field files al.Config.Files
 ---@field extensionsPath string
 ---@field vscodeExtensionsPath string
 ---@field dotnetPath string
@@ -78,6 +79,28 @@ local defaults = {
     multiproject = {
         settings_path = ".vscode/settings.json",
         closure_timeout_ms = 300000, -- 5 minutes; increase for very large workspaces
+    },
+    -- :AL renameFile / reorganizeFile, same patterns as the CRS AL Language
+    -- extension. Variables: <ObjectType>, <ObjectTypeShort>,
+    -- <ObjectTypeShortPascalCase>, <ObjectTypeShortUpper>, <ObjectId>,
+    -- <ObjectName>, <ObjectNameShort>, <BaseName>, <BaseNameShort>, <BaseId>,
+    -- <Prefix>, <Suffix>. The default follows the AA0215 best practice.
+    files = {
+        pattern = "<ObjectNameShort>.<ObjectTypeShortPascalCase>.al",
+        pattern_extensions = "<ObjectNameShort>.<ObjectTypeShortPascalCase>.al",
+        pattern_page_customizations = "<ObjectNameShort>.<ObjectTypeShortPascalCase>.al",
+        subfolder = "src", -- "None" disables reorganize
+        on_save = "none", -- "none" | "rename" | "reorganize"
+        use_git_mv = false,
+        by_namespace = false,
+        namespace_prefix_to_ignore = "",
+        object_name_prefix = "",
+        object_name_suffix = "",
+        remove_prefix_from_filename = false,
+        remove_suffix_from_filename = false,
+        remove_underscore_from_filename = true,
+        -- CRS.* keys in the project's .vscode/settings.json override these
+        read_crs_settings = true,
     },
 }
 
@@ -161,6 +184,7 @@ function M.setup(opts)
             require("al.buf").setup()
             require("al.integrations").setup()
             require("al.multiproject").setup()
+            require("al.files").setup()
         end)
     end
     return options
