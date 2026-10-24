@@ -148,18 +148,6 @@ function M.parse(lines)
     return obj
 end
 
---- Decodes a VS Code settings file (JSON with comments and trailing commas).
----@param text string
----@return table|nil
-local function decode_jsonc(text)
-    text = text:gsub(",(%s*[}%]])", "%1")
-    local ok, result = pcall(vim.json.decode, text, { skip_comments = true })
-    if ok and type(result) == "table" then
-        return result
-    end
-    return nil
-end
-
 --- Nearest *.code-workspace file at or above `root` (e.g. the project's parent
 --- folder, for a multi-root workspace with one folder per AL project).
 ---@param root string
@@ -185,7 +173,7 @@ local function workspace_settings(root)
     if not fd then
         return {}
     end
-    local json = decode_jsonc(fd:read("*a")) or {}
+    local json = Util.decode_jsonc(fd:read("*a")) or {}
     fd:close()
     return type(json.settings) == "table" and json.settings or {}
 end
@@ -202,7 +190,7 @@ function M.settings(root)
         local vscode_json = {}
         local fd = io.open(vim.fs.joinpath(root, ".vscode", "settings.json"))
         if fd then
-            vscode_json = decode_jsonc(fd:read("*a")) or {}
+            vscode_json = Util.decode_jsonc(fd:read("*a")) or {}
             fd:close()
         end
         for crs_key, key in pairs(crs_keys) do

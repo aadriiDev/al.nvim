@@ -57,4 +57,16 @@ function M.read_json_file(path)
     return table_content
 end
 
+--- Decodes a VS Code JSON file (JSON with comments and trailing commas).
+---@param text string
+---@return table|nil
+function M.decode_jsonc(text)
+    text = text:gsub(",(%s*[}%]])", "%1")
+    local ok, result = pcall(vim.json.decode, text, { skip_comments = true })
+    if ok and type(result) == "table" then
+        return result
+    end
+    return nil
+end
+
 return M

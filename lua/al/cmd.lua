@@ -70,6 +70,16 @@ M.commands = {
     config = function(args)
         require("al.editor_commands.config")(args, get_launch_configurations())
     end,
+    newLaunchConfig = function()
+        local root = get_project_root()
+        if not root then
+            Util.error("Could not determine AL workspace.")
+            return
+        end
+        coroutine.resume(coroutine.create(function()
+            require("al.editor_commands.launch_config")(root)
+        end))
+    end,
     lsp = function()
         local clients = Util.get_clients({ bufnr = 0 })
         clients = vim.tbl_filter(function(client)
