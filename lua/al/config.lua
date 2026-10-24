@@ -26,6 +26,7 @@ local M = {}
 ---@field files al.Config.Files
 ---@field variables al.Config.Variables
 ---@field objects al.Config.Objects
+---@field snippets { crs: boolean }
 ---@field extensionsPath string
 ---@field vscodeExtensionsPath string
 ---@field dotnetPath string
@@ -106,12 +107,18 @@ local defaults = {
         -- CRS.* keys in the project's .vscode/settings.json override these
         read_crs_settings = true,
     },
+    snippets = {
+        -- Design pattern, test, upgrade and FlowField snippets from the CRS AL
+        -- Language extension (triggers end in "waldo": ttestcasewaldo...)
+        crs = true,
+    },
     -- :AL newObject and the create*FromTable wizards
     objects = {
         application_area = "All",
         -- false: one ApplicationArea on the page/report; true: on every field
         application_area_on_fields = false,
         field_tooltip = "Specifies the value of the %1 field.",
+        action_tooltip = "Executes the %1 action.",
         list_usage_category = "Lists",
     },
     -- Variable names suggested from the type (al_var cmp source, v* snippets).

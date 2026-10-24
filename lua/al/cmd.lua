@@ -196,6 +196,15 @@ M.commands = {
     createXmlPort = function()
         require("al.objects").from_table("xmlport")
     end,
+    addToolTips = function(args)
+        require("al.properties").command("tooltips", args and args[1])
+    end,
+    addFieldCaptions = function(args)
+        require("al.properties").command("captions", args and args[1])
+    end,
+    searchDocs = function(args)
+        require("al.editor_commands.search_docs")(args)
+    end,
 }
 
 function M.execute(input)
@@ -218,6 +227,8 @@ local arg_completions = {
     newObject = function()
         return require("al.objects").types
     end,
+    addToolTips = { "project" },
+    addFieldCaptions = { "project" },
 }
 
 function M.complete(_, line)

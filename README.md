@@ -15,7 +15,11 @@ multi-project workspaces for Microsoft Dynamics 365 Business Central.
   stdio handle issues with AL EditorServices
 - **Build system** — `:AL build`, `:AL downloadSymbols`, `:AL definition`
 - **Treesitter** — syntax highlighting via [tree-sitter-al]
-- **Snippets** — AL snippets via LuaSnip, plus the snippets bundled with the installed AL extension
+- **Snippets** — AL snippets via LuaSnip, plus the snippets bundled with the
+  installed AL extension and the design pattern, test, upgrade and FlowField
+  snippets of the CRS AL Language extension (`ttestcasewaldo`...)
+- **Code cleanup** — add the missing ToolTips (AA0218) to page fields and
+  actions and Captions to table fields, in a file or the whole project
 - **File naming** — rename and reorganize files after the object they contain,
   with the same patterns and `CRS.*` settings as the CRS AL Language extension
 - **Variables** — variable names from the type (nvim-cmp source and `v*`
@@ -192,6 +196,9 @@ require("al").setup({
 | `:AL createReport` | Report with a column per field of the table in the buffer |
 | `:AL createQuery` | Query with a column per field of the table in the buffer |
 | `:AL createXmlPort` | XmlPort with an element per field of the table in the buffer |
+| `:AL addToolTips [project]` | Add missing ToolTips to page fields and actions (AA0218) |
+| `:AL addFieldCaptions [project]` | Add missing Captions to table fields |
+| `:AL searchDocs [terms]` | Search Microsoft Learn (default: the word under the cursor) |
 | `:AL lsp` | Show AL LSP client info and settings |
 
 ## Variables
@@ -239,9 +246,15 @@ objects = {
     application_area = "All",
     application_area_on_fields = false, -- true: on every field, not on the object
     field_tooltip = "Specifies the value of the %1 field.",
+    action_tooltip = "Executes the %1 action.", -- used by :AL addToolTips
     list_usage_category = "Lists",
 },
 ```
+
+`:AL addToolTips` and `:AL addFieldCaptions` use the same texts: page fields get
+`field_tooltip` with the source field name, actions get `action_tooltip`, and
+table fields get their name as Caption. API pages are skipped. Add `project` to
+change every AL file of the project.
 
 ## File naming
 

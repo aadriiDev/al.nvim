@@ -1,0 +1,36 @@
+{
+  "name": "crs-al-snippets",
+  "description": "Snippets from the CRS AL Language extension by waldo (MIT, see LICENSE.md)",
+  "contributes": {
+    "snippets": [
+      {
+        "language": "al",
+        "path": "./DesignPatterns.json"
+      },
+      {
+        "language": "al",
+        "path": "./Test.json"
+      },
+      {
+        "language": "al",
+        "path": "./al.json"
+      },
+      {
+        "language": "al",
+        "path": "./install.json"
+      },
+      {
+        "language": "al",
+        "path": "./page.json"
+      },
+      {
+        "language": "al",
+        "path": "./table.json"
+      },
+      {
+        "language": "al",
+        "path": "./upgrade.json"
+      }
+    ]
+  }
+}

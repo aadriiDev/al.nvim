@@ -11,6 +11,7 @@ local M = {}
 ---@field application_area string ApplicationArea of generated pages and reports
 ---@field application_area_on_fields boolean Repeat ApplicationArea on every field instead of the object
 ---@field field_tooltip string ToolTip of generated page fields; %1 is the field caption
+---@field action_tooltip string ToolTip added to page actions by :AL addToolTips; %1 is the action name
 ---@field list_usage_category string UsageCategory of generated list pages
 
 -- Object types `:AL newObject` can create

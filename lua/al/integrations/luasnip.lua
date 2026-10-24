@@ -25,9 +25,15 @@ M.setup = function()
         return
     end
 
-    local snippet_path = debug.getinfo(1).source:sub(2):gsub("integrations/luasnip.lua", "luasnippets")
+    local source = debug.getinfo(1).source:sub(2)
+    local snippet_path = source:gsub("integrations/luasnip.lua", "luasnippets")
     require("luasnip.loaders.from_lua").lazy_load({ paths = snippet_path })
     M.load_extension_snippets()
+    if require("al.config").snippets.crs then
+        -- <repo>/lua/al/integrations/luasnip.lua -> <repo>/snippets/crs
+        local root = vim.fs.dirname(vim.fs.dirname(vim.fs.dirname(vim.fs.dirname(source))))
+        require("luasnip.loaders.from_vscode").lazy_load({ paths = { vim.fs.joinpath(root, "snippets", "crs") } })
+    end
 end
 
 return M

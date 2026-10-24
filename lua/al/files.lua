@@ -326,7 +326,7 @@ end
 --- Buffer whose file is `path` (bufnr() would treat the path as a pattern).
 ---@param path string
 ---@return integer|nil
-local function find_buf(path)
+function M.find_buf(path)
     -- Buffer names may have symlinks resolved (/var -> /private/var on macOS)
     local real = vim.uv.fs_realpath(path) or path
     for _, buf in ipairs(vim.api.nvim_list_bufs()) do
@@ -405,7 +405,7 @@ function M.process(path, mode, opts)
         return nil, "Reorganize is disabled: files.subfolder (CRS.AlSubFolderName) is 'None'."
     end
 
-    local buf = find_buf(path)
+    local buf = M.find_buf(path)
     local loaded = buf ~= nil and vim.api.nvim_buf_is_loaded(buf)
     if not loaded then
         return process_file(path, mode, root, settings, buf, false)

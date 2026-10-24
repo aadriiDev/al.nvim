@@ -1,0 +1,56 @@
+{
+    "Snippet: Repeat Until": {
+        "prefix": "tiffindrepeatwaldo",
+        "body": [
+            "if ${1:Rec}.FindSet() then",
+            "\trepeat",
+            "\t$0",
+            "\tuntil ${1:Rec}.Next() < 1;"
+        ],
+        "description": "Snippet: if findset repeat until"
+    },
+    "Snippet (waldo): Declare a variable ": {
+        "description": "Snippet (waldo): Declare a variable",
+        "prefix": "tvarwaldo",
+        "body": [
+            "${3:VariableName}: ${1:Type} ${2:Subtype};",
+            "${0}"
+        ]
+    },
+    "Snippet (waldo): Field Groups": {
+        "description": "Snippet (waldo): Add Field Groups section",
+        "prefix": "tfieldgroupswaldo",
+        "body": [
+            "fieldgroups",
+            "{",
+            "\tfieldgroup(${1|DropDown,Brick|}; ${2:AddFieldsHere}) { }",
+            "}"
+        ]
+    },
+    "Snippet (waldo): Field Group": {
+        "description": "Snippet (waldo): Add Field Group",
+        "prefix": "tfieldgroupwaldo",
+        "body": [
+            "fieldgroup(${1|DropDown,Brick|}; ${2:AddFieldsHere}) { }"
+        ]
+    },
+    "Snippet (waldo): Codeunit with proc": {
+        "description": "Snippet (waldo): Procedure from clipboard",
+        "prefix": "tProcedureFromClipboardwaldo",
+        "body": [
+            "local procedure ${1:ProcedureName}()",
+            "begin",
+            "\t${CLIPBOARD}",
+            "end;",
+            "",
+            "${0}"
+        ]
+    },
+    "Snippet (waldo): Log Message": {
+        "description": "Snippet (waldo): Log Message",
+        "prefix": "tLogMessageWaldo",
+        "body": [
+            "Session.LogMessage('${1:Add Event ID}', ${2:AddMessageVariable}, Verbosity::${3|Normal,Critical,Error,Verbose,Warning|}, DataClassification::${4|SystemMetadata,AccountData,CustomerContent,EndUserIdentifiableInformation,EndUserPseudonymousIdentifiers,OrganizationIdentifiableInformation,ToBeClassified|}, TelemetryScope::${5|ExtensionPublisher,All|}, 'Category', ${6:AddValueVariable});"
+        ]
+    }
+}
