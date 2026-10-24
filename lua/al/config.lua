@@ -25,6 +25,7 @@ local M = {}
 ---@field multiproject al.Config.Multiproject
 ---@field files al.Config.Files
 ---@field variables al.Config.Variables
+---@field objects al.Config.Objects
 ---@field extensionsPath string
 ---@field vscodeExtensionsPath string
 ---@field dotnetPath string
@@ -104,6 +105,14 @@ local defaults = {
         remove_underscore_from_filename = true,
         -- CRS.* keys in the project's .vscode/settings.json override these
         read_crs_settings = true,
+    },
+    -- :AL newObject and the create*FromTable wizards
+    objects = {
+        application_area = "All",
+        -- false: one ApplicationArea on the page/report; true: on every field
+        application_area_on_fields = false,
+        field_tooltip = "Specifies the value of the %1 field.",
+        list_usage_category = "Lists",
     },
     -- Variable names suggested from the type (al_var cmp source, v* snippets).
     -- files.object_name_prefix/suffix are always ignored too.

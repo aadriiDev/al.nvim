@@ -178,6 +178,24 @@ M.commands = {
     sortVariables = function()
         require("al.variables").sort_command()
     end,
+    newObject = function(args)
+        require("al.objects").new_object(args and args[1])
+    end,
+    createListPage = function()
+        require("al.objects").from_table("page", "List")
+    end,
+    createCardPage = function()
+        require("al.objects").from_table("page", "Card")
+    end,
+    createReport = function()
+        require("al.objects").from_table("report")
+    end,
+    createQuery = function()
+        require("al.objects").from_table("query")
+    end,
+    createXmlPort = function()
+        require("al.objects").from_table("xmlport")
+    end,
 }
 
 function M.execute(input)
@@ -194,17 +212,24 @@ function M.execute(input)
 end
 
 -- Completions for the first argument of a command.
----@type table<string, string[]>
+---@type table<string, string[]|fun(): string[]>
 local arg_completions = {
     runObject = { "current", "testTool", "eventSubscribers", "databaseLocks", "Page", "Report", "Table", "Query" },
+    newObject = function()
+        return require("al.objects").types
+    end,
 }
 
 function M.complete(_, line)
     local prefix, args = M.parse(line)
     if #args == 1 and arg_completions[prefix] then
+        local values = arg_completions[prefix]
+        if type(values) == "function" then
+            values = values()
+        end
         return vim.tbl_filter(function(value)
             return value:find(args[1], 1, true) == 1
-        end, arg_completions[prefix])
+        end, values)
     end
     if #args > 0 then
         return {}

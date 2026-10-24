@@ -21,6 +21,8 @@ multi-project workspaces for Microsoft Dynamics 365 Business Central.
 - **Variables** — variable names from the type (nvim-cmp source and `v*`
   snippets), jump to the local/global var section and sort declarations as
   CodeCop AA0021 expects
+- **New object wizards** — `:AL newObject` with the next free id, and list/card
+  pages, reports, queries and xmlports generated from a table
 - **Progress notifications** — real-time feedback during project loading and
   builds
 
@@ -184,6 +186,12 @@ require("al").setup({
 | `:AL gotoLocalVars` | Jump to the var section of the current procedure (adds one if missing) |
 | `:AL gotoGlobalVars` | Jump to the object's global var section |
 | `:AL sortVariables` | Sort every var section in the AA0021 order |
+| `:AL newObject [type]` | Create an object with the next free id from app.json |
+| `:AL createListPage` | List page from the table in the buffer (all its fields) |
+| `:AL createCardPage` | Card page from the table in the buffer |
+| `:AL createReport` | Report with a column per field of the table in the buffer |
+| `:AL createQuery` | Query with a column per field of the table in the buffer |
+| `:AL createXmlPort` | XmlPort with an element per field of the table in the buffer |
 | `:AL lsp` | Show AL LSP client info and settings |
 
 ## Variables
@@ -210,6 +218,30 @@ Temporary records get the `Temp` prefix that AA0073 requires.
   Notification, BigText, DateFormula, RecordId, RecordRef, FieldRef and
   FilterPageBuilder first, in that order; other declarations keep their order.
   Sections with `#if` directives are left untouched.
+
+## New objects
+
+`:AL newObject` asks for the type, the name and, depending on the type, the
+extended object or the source table. The id is the first one in the app.json
+`idRanges` not used by another object of the same type, the file is named with
+the [file naming](#file-naming) patterns and the object reuses the namespace
+of the current file.
+
+`:AL createListPage`, `createCardPage`, `createReport`, `createQuery` and
+`createXmlPort` work on the table in the current buffer and add all its fields
+(FlowFilters, removed fields and Blob/Media fields are left out), so you only
+delete the ones you do not need. Outside a table they ask for the table name and
+create the object without fields. The new file goes to the folder of its type
+when the project has one folder per type (`src/table/` → `src/page/`).
+
+```lua
+objects = {
+    application_area = "All",
+    application_area_on_fields = false, -- true: on every field, not on the object
+    field_tooltip = "Specifies the value of the %1 field.",
+    list_usage_category = "Lists",
+},
+```
 
 ## File naming
 
