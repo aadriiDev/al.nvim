@@ -36,8 +36,9 @@ end
 --- Scoped to the specific client via client.handlers to avoid mutating the
 --- global vim.lsp.handlers table.
 ---@param client vim.lsp.Client
+---@param config al.LaunchConfiguration
 ---@return fun() cleanup function to remove the handler
-local function watch_log_messages(client)
+local function watch_log_messages(client, config)
     local prev_handler = client.handlers["window/logMessage"]
 
     client.handlers["window/logMessage"] = function(err, result, ctx, cfg)
@@ -62,6 +63,9 @@ local function watch_log_messages(client)
         elseif msg:match("Done publishing the full dependency tree") then
             emit_progress(client.id, "end", "Published successfully")
             Util.info("Package published successfully")
+            if config.launchBrowser ~= false then
+                require("al.editor_commands.open_in_browser")(config)
+            end
             -- Restore original handler
             client.handlers["window/logMessage"] = prev_handler
         elseif msg:match("Failed to publish") or msg:match("PublishingFailed") then
@@ -122,7 +126,7 @@ local publish = function(config)
 
     -- Watch window/logMessage for publish completion since the server
     -- never sends a JSON-RPC response for al/fullDependencyPublish
-    local cleanup = watch_log_messages(client)
+    local cleanup = watch_log_messages(client, config)
 
     emit_progress(client.id, "report", "Building...", 10)
     client:request("al/fullDependencyPublish", params, function(err, result)
