@@ -139,6 +139,12 @@ M.commands = {
     restartLsp = function()
         require("al.editor_commands.restart_lsp")()
     end,
+    installExtension = function()
+        require("al.editor_commands.install_extension")()
+    end,
+    updateExtension = function()
+        require("al.editor_commands.install_extension")()
+    end,
     eventPublishers = function()
         require("al.editor_commands.event_publishers")()
     end,

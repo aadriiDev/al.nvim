@@ -19,7 +19,8 @@ al.nvim provides AL language support for Neovim, designed for Microsoft
 Dynamics 365 Business Central development.
 
 Features:
-  - LSP integration via the AL Language Server (from the VS Code AL extension)
+  - LSP integration via the AL Language Server (from the AL Language
+    extension, installed with |:AL-installExtension|, VS Code not required)
   - Multi-project workspace support via code-workspace.nvim
   - Debugging support via nvim-dap with a cross-platform debug proxy
   - Build, authentication, and symbol management commands
@@ -31,7 +32,11 @@ Features:
 
 Required:
   - Neovim >= 0.10
-  - Microsoft AL Language Extension for VS Code (provides the language server)
+  - Microsoft AL Language Extension (provides the language server). Install
+    it with |:AL-installExtension| (needs `curl` and `unzip`) or reuse the
+    one installed by VS Code.
+  - .NET 10 runtime (`dotnet` on PATH). Since v18 the extension ships the
+    language server as a cross-platform `.dll`.
   - nui.nvim        UI for auth and symbol download menus
   - nvim-nio        async I/O for multi-project and debugging
 
@@ -78,8 +83,18 @@ With multi-project workspace support: >lua
 Pass a table to the setup function via `opts` to override defaults: >lua
 
     require("al").setup({
-        -- Path to the directory containing VS Code extensions.
+        -- Where |:AL-installExtension| installs the AL Language extension.
+        -- Scanned first for the extension (highest version wins).
+        extensionsPath = vim.fn.stdpath("data") .. "/al-extension",
+
+        -- Path to the directory containing VS Code extensions (fallback).
         vscodeExtensionsPath = "~\\.vscode\\extensions\\",
+
+        -- .NET host used to start the language server .dll (v18+).
+        dotnetPath = "dotnet",
+
+        -- Allow |:AL-installExtension| to install Marketplace pre-releases.
+        extensionPrerelease = false,
 
         integrations = {
             luasnip = true,
@@ -182,6 +197,14 @@ All commands use the `:AL` prefix.
                                                                *:AL-build*
 :AL build           Build the AL package for the current workspace via the
                     language server.
+
+                                                  *:AL-installExtension*
+:AL installExtension
+:AL updateExtension Download the latest AL Language extension from the Visual
+                    Studio Marketplace into `extensionsPath`. Pre-releases are
+                    skipped unless `extensionPrerelease` is set. Keeps the
+                    previous version as a rollback and restarts the language
+                    server when the active version changes.
 
                                                     *:AL-downloadSymbols*
 :AL downloadSymbols Download AL symbol packages. Prompts for a launch

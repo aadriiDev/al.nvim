@@ -6,8 +6,8 @@ multi-project workspaces for Microsoft Dynamics 365 Business Central.
 ## Features
 
 - **LSP integration** — code completion, diagnostics, go-to-definition, inlay
-  hints, and semantic folding via the AL Language Server (from the VS Code AL
-  extension)
+  hints, and semantic folding via the AL Language Server (from the AL Language
+  extension, installed with `:AL installExtension` — VS Code not required)
 - **Multi-project workspaces** — open `.code-workspace` files containing
   multiple AL projects with full project-reference closure support (requires
   [code-workspace.nvim])
@@ -22,8 +22,11 @@ multi-project workspaces for Microsoft Dynamics 365 Business Central.
 ## Requirements
 
 - Neovim >= 0.10
-- [Microsoft AL Language Extension] for VS Code (provides the language server
-  binary)
+- [Microsoft AL Language Extension] (provides the language server). Install it
+  with `:AL installExtension` (needs `curl` and `unzip`), or reuse the one
+  installed by VS Code.
+- [.NET 10 runtime](https://dotnet.microsoft.com/download) (`dotnet` on PATH):
+  since v18 the extension ships the language server as a cross-platform `.dll`
 
 ## Installation
 
@@ -76,9 +79,18 @@ All options with their defaults:
 
 ```lua
 require("al").setup({
-    -- Path to VS Code extensions directory.
-    -- The plugin scans this for the AL Language extension.
+    -- Where `:AL installExtension` installs the AL Language extension.
+    -- Scanned first for the extension (highest version wins).
+    extensionsPath = vim.fn.stdpath("data") .. "/al-extension",
+
+    -- Path to VS Code extensions directory, used as a fallback.
     vscodeExtensionsPath = "~\\.vscode\\extensions\\",
+
+    -- .NET host used to start the language server .dll (extension v18+).
+    dotnetPath = "dotnet",
+
+    -- Allow `:AL installExtension` to install Marketplace pre-releases.
+    extensionPrerelease = false,
 
     integrations = {
         luasnip = true,
@@ -146,6 +158,8 @@ require("al").setup({
 | `:AL runObject [Type] [Id]` | Run a Business Central object |
 | `:AL openInBrowser` | Open Business Central web client |
 | `:AL restartLsp` | Restart the AL language server |
+| `:AL installExtension` | Download the latest AL Language extension from the Marketplace |
+| `:AL updateExtension` | Same as `installExtension`; restarts the server if the version changed |
 | `:AL eventPublishers` | List event publishers in quickfix |
 | `:AL symbolSearch [query]` | Search AL symbols |
 | `:AL dependencies` | Show package dependencies |

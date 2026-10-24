@@ -155,6 +155,12 @@ function M.setup()
 
     local cmd = M.cmd()
     if not cmd then
+        Utils.warn(
+            "AL Language extension not found in "
+                .. table.concat(require("al.extension").search_paths(), ", ")
+                .. ".\nRun `:AL installExtension` to download it from the Marketplace.",
+            { once = true }
+        )
         return
     end
     vim.lsp.config.al_ls = {
@@ -190,12 +196,11 @@ function M.setup()
 end
 
 function M.cmd()
-    local lsp_path = M.find_lsp_path(Config.vscodeExtensionsPath, false)
-    if not lsp_path then
+    local server_cmd = require("al.extension").server_cmd()
+    if not server_cmd then
         return nil
     end
-    return {
-        lsp_path,
+    return vim.list_extend(server_cmd, {
         "/telemetryLevel:" .. Config.lsp.telemetryLevel,
         "/browser:" .. Config.lsp.browser,
         "/inlayHintsParameterNames:" .. tostring(Config.lsp.inlayHintsParameterNames),
@@ -206,49 +211,27 @@ function M.cmd()
         "/extendGoToSymbolInWorkspaceIncludeSymbolFiles:"
             .. tostring(Config.lsp.extendGoToSymbolInWorkspaceIncludeSymbolFiles),
         "/sessionId:" .. (Utils.create_uuid()),
-    }
+    })
 end
 
+--- Path to the EditorServices host of the installed AL Language extension.
+--- With `is_dll` it returns the .dll (started through `dotnet`, e.g. by the
+--- debug proxy), otherwise the native executable when the extension ships one.
+---@param basePath? string Only search this folder (defaults to the configured paths)
+---@param is_dll boolean
+---@return string|nil
 function M.find_lsp_path(basePath, is_dll)
-    local path = ""
-    local os_name = vim.uv.os_uname().sysname:lower()
-    local sep = os_name:match("windows") and "\\" or "/"
-    local binary_folder = sep .. "bin" .. sep .. (os_name:match("windows") and "win32" or "linux") .. sep
-
-    -- Expand ~ to full path
-    local expanded_base = vim.fn.expand(basePath)
-
-    local handle = vim.uv.fs_scandir(expanded_base)
-    if not handle then
+    local Extension = require("al.extension")
+    local ext = Extension.find(basePath)
+    if not ext then
         return nil
     end
-
-    while true do
-        local filename, t = vim.uv.fs_scandir_next(handle)
-        if not filename then
-            break
-        end
-        if t == "directory" then
-            local match = filename:match("ms%-dynamics%-smb.al%-(.+)")
-            if match then
-                Config.language_extension_version = match
-                path = expanded_base
-                    .. (expanded_base:sub(-1) == sep and "" or sep)
-                    .. filename
-                    .. binary_folder
-                    .. (
-                        is_dll and "Microsoft.Dynamics.Nav.EditorServices.Host.dll"
-                        or "Microsoft.Dynamics.Nav.EditorServices.Host"
-                    )
-            end
-        end
+    Config.language_extension_version = ext.version
+    local server = Extension.server(ext)
+    if is_dll then
+        return server.dll
     end
-
-    if path == "" then
-        return nil
-    end
-
-    return path
+    return server.native
 end
 
 function M.go_to_definition()

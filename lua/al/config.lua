@@ -23,8 +23,19 @@ local M = {}
 ---@class al.Config
 ---@field lsp al.Config.LSP
 ---@field multiproject al.Config.Multiproject
+---@field extensionsPath string
+---@field vscodeExtensionsPath string
+---@field dotnetPath string
+---@field extensionPrerelease boolean
 local defaults = {
+    -- Where `:AL installExtension` installs the AL Language extension.
+    -- Searched first; vscodeExtensionsPath is used as a fallback.
+    extensionsPath = vim.fn.stdpath("data") .. "/al-extension",
     vscodeExtensionsPath = "~\\.vscode\\extensions\\",
+    -- .NET host used to start the language server (extension v18+ ships a .dll)
+    dotnetPath = "dotnet",
+    -- Let `:AL installExtension` pick Marketplace pre-release versions
+    extensionPrerelease = false,
     integrations = {
         luasnip = true,
         treesitter = true,

@@ -112,7 +112,7 @@ function M.args()
     end
 
     return {
-        Lsp.find_lsp_path(Config.vscodeExtensionsPath, true),
+        Lsp.find_lsp_path(nil, true),
         "/telemetryLevel:" .. Config.lsp.telemetryLevel,
         "/browser:" .. Config.lsp.browser,
         "/inlayHintsParameterNames:" .. tostring(Config.lsp.inlayHintsParameterNames),

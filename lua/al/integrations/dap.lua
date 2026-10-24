@@ -80,7 +80,7 @@ function M.args()
     local ws = Workspace.find({ path = fname })
 
     return {
-        Config.lspPath and Config.lspPath .. ".dll" or Lsp.find_lsp_path(Config.vscodeExtensionsPath, true),
+        Config.lspPath and Config.lspPath .. ".dll" or Lsp.find_lsp_path(nil, true),
         "/logLevel:Debug",
         "/telemetryLevel:" .. Config.lsp.telemetryLevel,
         "/browser:" .. Config.lsp.browser,
