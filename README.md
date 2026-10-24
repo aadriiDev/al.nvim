@@ -15,7 +15,7 @@ multi-project workspaces for Microsoft Dynamics 365 Business Central.
   stdio handle issues with AL EditorServices
 - **Build system** — `:AL build`, `:AL downloadSymbols`, `:AL definition`
 - **Treesitter** — syntax highlighting via [tree-sitter-al]
-- **Snippets** — AL snippets via LuaSnip
+- **Snippets** — AL snippets via LuaSnip, plus the snippets bundled with the installed AL extension
 - **Progress notifications** — real-time feedback during project loading and
   builds
 
@@ -155,7 +155,7 @@ require("al").setup({
 | `:AL authenticate` | Authenticate for a launch configuration |
 | `:AL clearCredentialsCache` | Clear cached credentials |
 | `:AL definition` | Go to AL definition (uses al/gotodefinition) |
-| `:AL runObject [Type] [Id]` | Run a Business Central object |
+| `:AL runObject [Type] [Id]` | Run a Business Central object. `current` runs the object in the buffer; `testTool`, `eventSubscribers` and `databaseLocks` open those system pages |
 | `:AL openInBrowser` | Open Business Central web client |
 | `:AL restartLsp` | Restart the AL language server |
 | `:AL installExtension` | Download the latest AL Language extension from the Marketplace |

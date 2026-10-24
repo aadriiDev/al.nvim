@@ -172,8 +172,19 @@ function M.execute(input)
     M.commands[prefix](args)
 end
 
+-- Completions for the first argument of a command.
+---@type table<string, string[]>
+local arg_completions = {
+    runObject = { "current", "testTool", "eventSubscribers", "databaseLocks", "Page", "Report", "Table", "Query" },
+}
+
 function M.complete(_, line)
     local prefix, args = M.parse(line)
+    if #args == 1 and arg_completions[prefix] then
+        return vim.tbl_filter(function(value)
+            return value:find(args[1], 1, true) == 1
+        end, arg_completions[prefix])
+    end
     if #args > 0 then
         return {}
     end

@@ -55,6 +55,11 @@ describe("al.cmd", function()
             assert.is_true(#results > 10)
         end)
 
+        it("completes runObject arguments", function()
+            local results = cmd.complete(nil, "AL runObject te")
+            assert.are.same({ "testTool" }, results)
+        end)
+
         it("returns empty for known command with trailing space", function()
             local results = cmd.complete(nil, "AL config ")
             assert.are.same({}, results)
